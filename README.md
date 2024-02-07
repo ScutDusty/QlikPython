@@ -1,0 +1,2 @@
+# QlikPython
+Qlik and Python
