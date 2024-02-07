@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jan 24 16:53:50 2024
-
 @author: ScutDusty
 """
-# Грузим библиотеки
+# Load libraries
 import pandas as pd
 import numpy as np
 import sys
@@ -13,17 +11,17 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib, ssl
 
-# Путь к датафрейму 
-dataframe1 = pd.read_csv('//QLIK-SENSE/Qlik_Share/Python/Logs/TaskFails.csv') .fillna(0)
+# Path to dataframe
+dataframe1 = pd.read_csv('path to temp folder'/TaskFails.csv') .fillna(0)
 
-# Если датафрейм пустой - завершить скрипт
+# If dataframe is empty - exit script
 if len(dataframe1)==0: sys.exit(0)
 
-# Настройки отправки
-strFrom = 'Qlik@autoeuro.ru'
-strTo = ['artem.mokrushin@autoeuro.ru', 'daniil.popov@autoeuro.ru'] # Список получателей
+# Sender setup
+strFrom = 'Qlik@YourCompany.com'
+strTo = ['Email1@YourCompany.com', 'Email2@YourCompany.com'] # Recipients list
 msgRoot = MIMEMultipart('related')
-msgRoot['Subject'] = 'Qlik Task fails' #Тема письма
+msgRoot['Subject'] = 'Qlik Task fails' # Email subject
 msgRoot['From'] = strFrom
 msgRoot['To'] = ', '.join( strTo ) 
 msgRoot.preamble = 'This is a multi-part message in MIME format.'
@@ -31,7 +29,7 @@ msgRoot.preamble = 'This is a multi-part message in MIME format.'
 msgAlternative = MIMEMultipart('alternative')
 msgRoot.attach(msgAlternative)
 
-# Переводим датафрейм в теги HTML
+# Dataframe to HTML
 HTMLtable = dataframe1.to_html()
 
 # Текст письма со вставленным в него датафреймом
@@ -54,10 +52,10 @@ msgAlternative.attach(msgText)
 
 # Настройки почтового сервера
 port = 465  # For SSL
-smtp_server = "post-02.autoeuro.ru"
-sender_email = "Qlik@autoeuro.ru"
-receiver_email = "artem.mokrushin@autoeuro.ru"  
-password = "lYFZo$q5#A@X0yvf"
+smtp_server = "XXXXXXXXXXXXXX"  # SMTP server
+sender_email = "Qlik@YourCompany.com"
+receiver_email = "Email1@YourCompany.com"  
+password = "XXXXXXXXXXXX" # Password
 context = ssl.create_default_context()
 
 # Отправка
