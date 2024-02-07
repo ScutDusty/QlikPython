@@ -2,7 +2,7 @@
 """
 Created on Wed Jan 24 16:53:50 2024
 
-@author: mokrushin_a
+@author: ScutDusty
 """
 # Грузим библиотеки
 import pandas as pd
