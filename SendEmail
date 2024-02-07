@@ -32,10 +32,10 @@ msgRoot.attach(msgAlternative)
 # Dataframe to HTML
 HTMLtable = dataframe1.to_html()
 
-# Текст письма со вставленным в него датафреймом
+# HTML with dataframe
 msgText = MIMEText(
 '''
-<p> Task не запустился: </p> 
+<p> Tasks failed: </p> 
 <p>&nbsp;</p>
 ''' 
 +
@@ -44,13 +44,13 @@ HTMLtable
 '''
 <p>&nbsp;</p>
 <p><br />
-<span style="color:#e74c3c">Данное сообщение сформировано автоматически </span></p>
-<p>По вопросам рассылки обращайтесь:&nbsp;</p>
-<p>E-Mail: <a href="mailto:HelpDesk@autoeuro.ru?subject=Email%20reports">HelpDesk@autoeuro.ru</a></p> ''', 'html')
+<span style="color:#e74c3c">This massage was created automatically </span></p>
+<p>If you have any questions:&nbsp;</p>
+<p>E-Mail: <a href="mailto:HelpDesk@YourCompany.com?subject=Email%20reports">HelpDesk@aYourCompany.com</a></p> ''', 'html')
 
 msgAlternative.attach(msgText)
 
-# Настройки почтового сервера
+# Server setup
 port = 465  # For SSL
 smtp_server = "XXXXXXXXXXXXXX"  # SMTP server
 sender_email = "Qlik@YourCompany.com"
