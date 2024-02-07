@@ -1,0 +1,54 @@
+
+/*
+// Uncomment this after first load ! ! !
+TasksOld:
+Load
+max(@1) AS MaxID
+from ['Path to temp files folder'\TaskLog.csv] (txt,  codepage is 65001, explicit labels, delimiter is '\t', no quotes); //<------------------------------------------- Fill path here
+let vMaxID = Peek('MaxID', 0, 'TasksOld');
+Drop table TasksOld;
+*/
+
+TasksNew:
+Load *
+FROM [c:/ProgramData/Qlik/Sense/Log/Scheduler/Trace/QLIK-SENSE_System_Scheduler.txt] 
+(txt,  codepage is 65001, explicit labels, delimiter is '\t', no quotes);
+
+Tasks_1:
+load
+@1 AS ID,
+@2 AS DateTime,
+@3 AS Status,
+@9 AS Comment,
+@13 As TaskName
+resident TasksNew
+Where RecNo() >1;
+Drop table TasksNew;
+
+Tasks_2:
+load *,
+  If(WildMatch(Comment, '*Message from ReloadProvider: Reload failed in Engine. Check engine or script logs.*'), 1, 0) as ErrorFlag
+resident Tasks_1
+where ID>$(vMaxID) 
+and Status = 'ERROR' 
+;
+Drop table Tasks_1;
+
+Tasks:
+Load 
+TaskName As FailedTaskName,
+timestamp(timestamp#(Replace(DateTime,'+0300',''),'YYYYMMDDThhmmss'),'DD.MM.YYYY hh:mm:ss') AS FailDateTime
+Resident Tasks_2
+Where ErrorFlag = '1'
+;
+Drop table Tasks_2;
+STORE Tasks INTO ['Path to temp files folder'\TaskFails.csv] (txt); //<------------------------------------------- Here
+Drop table Tasks;
+
+TaskLog:
+Load
+@1
+FROM [c:/ProgramData/Qlik/Sense/Log/Scheduler/Trace/QLIK-SENSE_System_Scheduler.txt]
+(txt,  codepage is 65001, explicit labels, delimiter is '\t', no quotes);
+STORE TaskLog INTO ['Path to temp files folder'\TaskLog.csv] (txt); //<------------------------------------------- And here
+Drop table TaskLog;
