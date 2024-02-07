@@ -1,0 +1,71 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jan 24 16:53:50 2024
+
+@author: mokrushin_a
+"""
+# Грузим библиотеки
+import pandas as pd
+import numpy as np
+import sys
+from email.mime.image import MIMEImage
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib, ssl
+
+# Путь к датафрейму 
+dataframe1 = pd.read_csv('//QLIK-SENSE/Qlik_Share/Python/Logs/TaskFails.csv') .fillna(0)
+
+# Если датафрейм пустой - завершить скрипт
+if len(dataframe1)==0: sys.exit(0)
+
+# Настройки отправки
+strFrom = 'Qlik@autoeuro.ru'
+strTo = ['artem.mokrushin@autoeuro.ru', 'daniil.popov@autoeuro.ru'] # Список получателей
+msgRoot = MIMEMultipart('related')
+msgRoot['Subject'] = 'Qlik Task fails' #Тема письма
+msgRoot['From'] = strFrom
+msgRoot['To'] = ', '.join( strTo ) 
+msgRoot.preamble = 'This is a multi-part message in MIME format.'
+
+msgAlternative = MIMEMultipart('alternative')
+msgRoot.attach(msgAlternative)
+
+# Переводим датафрейм в теги HTML
+HTMLtable = dataframe1.to_html()
+
+# Текст письма со вставленным в него датафреймом
+msgText = MIMEText(
+'''
+<p> Task не запустился: </p> 
+<p>&nbsp;</p>
+''' 
++
+HTMLtable 
++ 
+'''
+<p>&nbsp;</p>
+<p><br />
+<span style="color:#e74c3c">Данное сообщение сформировано автоматически </span></p>
+<p>По вопросам рассылки обращайтесь:&nbsp;</p>
+<p>E-Mail: <a href="mailto:HelpDesk@autoeuro.ru?subject=Email%20reports">HelpDesk@autoeuro.ru</a></p> ''', 'html')
+
+msgAlternative.attach(msgText)
+
+# Настройки почтового сервера
+port = 465  # For SSL
+smtp_server = "post-02.autoeuro.ru"
+sender_email = "Qlik@autoeuro.ru"
+receiver_email = "artem.mokrushin@autoeuro.ru"  
+password = "lYFZo$q5#A@X0yvf"
+context = ssl.create_default_context()
+
+# Отправка
+try:
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, (strTo),  msgRoot.as_string())
+except Exception as e:
+        print(f'Error sending email: {e}.')
+else:
+        print('Email sent successfully')
